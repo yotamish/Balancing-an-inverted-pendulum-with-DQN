@@ -1,8 +1,8 @@
 close all; clear; clc
 
 %% enable camera for remote picture
-%cam=webcam
-%preview(cam)
+cam=webcam;
+preview(cam)
 
 %% define hyper-parameters for dqn
 C = 50;                %number of cycles until we substitute (Q_target)<-(Q)
@@ -62,8 +62,6 @@ else
     rpBuffer = ReplayBuffer(D,1,STATE_SIZE);%D is the buffer size; 1 is the action dimension(1,2,3,..); STATE_SIZE is the state dimension (curr_angle,prev_angle,curr_pos,prev_pos)
 end
 
-% rpBuffer = ReplayBuffer(D,1,5);%D is the buffer size; 1 is the action dimension(1,2,3,..); 4 is the state dimension (curr_angle,prev_angle,curr_pos,prev_pos)
-
 
 %*****create sessions for reading/writing to the penundulum******
 counterNBits = 32;
@@ -83,14 +81,7 @@ addAnalogOutputChannel(s1,'Dev1',1,'Voltage');
 
 %% loop episode
 for j=1:Episodes
-%     Disp= ['Episode: ', num2str(j), ' starts'];
-% 	disp(Disp);
-%init "zero state" - (s_t,a_t)
 
-%FIXME: decide how to do it
-
-%     disp "start!";
-%     pause(2)      %YOTAM: I DISABLED IT FOR TIME SAVING
 
     %*******************loop single*****************
     
@@ -148,11 +139,9 @@ for j=1:Episodes
         x_dot = (x-curr_state(1))/DESIRED_LOOP_TIME;
         theta_dot = ((theta*pi/180)-acos(curr_state(3)))/DESIRED_LOOP_TIME;
         curr_state2 = [x;x_dot;cos(theta*pi/180);sin(theta*pi/180);theta_dot];
+        
         %calc reward       
-
         curr_reward = -n*(q(1)*abs(x) + q(2)*abs(x_dot) - q(3)*(2-abs(1+cos(theta*pi/180))) + q(4)*abs(theta_dot) + r*abs(ArrOfActions(action2take)));
-%         Disp= ['x: ', num2str(x),' x_dot: ', num2str(x_dot),' theta: ', num2str(theta),' theta_dot: ', num2str(theta_dot), ' ArrOfActions(action2take): ', num2str(ArrOfActions(action2take)), ' curr_reward: ', num2str(curr_reward)];
-%         disp(Disp);
 
         R_tot = R_tot + curr_reward;
 
@@ -206,10 +195,8 @@ for j=1:Episodes
     
     outputSingleScan(s1,0); %this is for resting the damn penundulum
 
-%     R_tot_arr = cat(1,R_tot_arr,R_tot); %save cumulative reward per episode to indicate learning
     R_tot_arr = [R_tot_arr , R_tot];
-%   Disp= ['Reward: ', num2str(R_tot)];
-% 	disp(Disp);
+
     % this is where we try to learn
 
     Disp= ['episode ', num2str(j),'/',num2str(Episodes),  '(',num2str(length(R_tot_arr)),')',', reward: ', num2str(R_tot)];
@@ -232,7 +219,6 @@ for j=1:Episodes
         end
 
         % train on estimated Q_next and rewards
-        %sess.run(Q_train_step, {state_input:s_batch, y_estimate:Y})
         Q = train(Q,batch_s',Y);
 
 
@@ -315,4 +301,4 @@ save('System_State_real.mat')
     %************END BRINGING PEN. TO CENTER**************************
     
 
-outputSingleScan(s1,0); %this is for resting the damn penundulum
+outputSingleScan(s1,0); %this is for resting the damn pendulum
