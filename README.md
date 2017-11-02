@@ -1,4 +1,4 @@
-# Balancing-an-inverted-pendulum-with-DQN
+# Balancing an inverted pendulum with DQN
 
 Deep Q-network for self balancing an inverted pendulum both in simulation and reality.
 
